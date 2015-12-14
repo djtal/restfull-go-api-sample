@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/gorilla/mux"
+	"strconv"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,14 @@ func TodoIndex(w http.ResponseWriter, r *http.Request) {
 func TodoShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	todoId := vars["todoId"]
-	fmt.Fprintf(w, "Todo show: %s\n", todoId)
+	id, _ := strconv.Atoi(todoId)
+
+	t := RepoFindTodo(id)
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		panic(err)
+	}
 }
 
 func TodoCreate(w http.ResponseWriter, r *http.Request) {
@@ -52,4 +59,18 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(t); err != nil {
 		panic(err)
 	}
+}
+
+func TodoDestroy(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	todoId := vars["todoId"]
+
+	id, _ := strconv.Atoi(todoId)
+	err := RepoDestroyTodo(id)
+
+	if err := json.NewEncoder(w).Encode(err); err != nil {
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 }
