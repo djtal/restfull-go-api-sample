@@ -61,6 +61,12 @@ var routes = Routes{
 		TodoCreate,
 	},
 	Route{
+		"TodoUpdate",
+		"POST",
+		"/todos/{todoId}",
+		TodoUpdate,
+	},
+	Route{
 		"TodoDestroy",
 		"DELETE",
 		"/todos/{todoId}",
